@@ -26,7 +26,7 @@ VERSION = "1.1.1"
 GAME_BUILD = "9.2 (Peru Hunting Reserve)"
 
 # Fill these in once the pages are live.
-GITHUB = "https://github.com/YOUR-NAME/theHunterCotW-VR"
+GITHUB = "https://github.com/vaas993/theHunterCotW-VR"
 NEXUS = "https://www.nexusmods.com/thehuntercallofthewild/mods/YOUR-ID"
 
 LIMIT = 2000

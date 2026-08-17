@@ -73,6 +73,19 @@ Everything can be rebound in the panel, and the panel works with a gamepad.
 
 ---
 
+## Antivirus warnings
+
+Some scanners flag the mod. That is expected for what it is: it loads into the
+game through a proxy DLL and patches engine code in memory to render per eye —
+DLL injection plus code hooking, which is what heuristics look for — and the
+settings window is a bundled Python program, flagged for the same
+guilt-by-association reason. Nothing is code-signed.
+
+[VirusTotal scan of the current release](https://www.virustotal.com/gui/file/db43ebf8028b03a9cf741296db93ad20df8ca315876bbb13bc0d3eff96178740/detection) — and the entire source is in this
+repository: read it, or build it yourself with [BUILDING.md](BUILDING.md).
+
+---
+
 ## Known issues
 
 - **Objects can shake or shimmer with DLSS on** — worst on close-up geometry and edges. Weapon depth makes it worse - it confuses the picture pass about which camera drew the frame, and the result is seen as the WORLD shaking rather than the weapon. Two things help: DLSS models M and L reduce the shaking noticeably, and turning weapon depth off on the WEAPON tab removes its share of it entirely.

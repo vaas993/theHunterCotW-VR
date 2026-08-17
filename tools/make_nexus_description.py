@@ -25,10 +25,11 @@ VERSION = "1.1.1"
 GAME_BUILD = "9.2 (Peru Hunting Reserve)"
 AUTHOR = "Vaas993"
 
+VIRUSTOTAL = "https://www.virustotal.com/gui/file/db43ebf8028b03a9cf741296db93ad20df8ca315876bbb13bc0d3eff96178740/detection"
 DISCORD = "https://discord.gg/gbC9AkG2Xn"
 PATREON = "https://www.patreon.com/cw/Vaas993"
 PROFILE = "https://www.nexusmods.com/profile/Vaas993/mods"
-GITHUB = "https://github.com/YOUR-NAME/theHunterCotW-VR"   # fill in
+GITHUB = "https://github.com/vaas993/theHunterCotW-VR"
 
 
 def known_issues():
@@ -168,6 +169,21 @@ this build. It identifies the game by fingerprint and refuses to guess.
 
 [line]
 
+%(h_av)s
+Antivirus software may flag this mod, and here is why, in the open: it loads
+into the game through a proxy DLL and patches engine code in memory to move the
+camera per eye - DLL injection and code hooking, which is exactly what heuristic
+scanners look for. The settings window is a bundled Python program, which gets
+flagged for the same guilt-by-association reason. Nothing is code-signed.
+
+[list]
+[*][b]VirusTotal scan of this exact release:[/b] [url=%(vt)s]%(vt)s[/url]
+[*][b]The complete source code is public:[/b] [url=%(github)s]%(github)s[/url] -
+read it, or build it yourself with BUILDING.md
+[/list]
+
+[line]
+
 %(h_links)s
 [list]
 [*][b]Discord[/b] (support and updates): [url=%(discord)s]%(discord)s[/url]
@@ -194,7 +210,8 @@ Studios. This mod is unofficial and is not affiliated with or endorsed by them.
 """ % {
         "author": AUTHOR, "build": GAME_BUILD, "issues": issues,
         "discord": DISCORD, "patreon": PATREON, "profile": PROFILE,
-        "github": GITHUB,
+        "github": GITHUB, "vt": VIRUSTOTAL,
+        "h_av": h("Antivirus warnings, and why"),
         "h_req": h("Requirements"),
         "h_install": h("Installation"),
         "h_aa": h("Anti-aliasing - three choices, and DLSS is only one of them"),
