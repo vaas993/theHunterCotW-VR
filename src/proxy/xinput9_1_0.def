@@ -1,0 +1,6 @@
+LIBRARY XINPUT9_1_0
+EXPORTS
+    XInputGetCapabilities           = Proxy_XInputGetCapabilities           @2
+    XInputGetDSoundAudioDeviceGuids = Proxy_XInputGetDSoundAudioDeviceGuids @3
+    XInputGetState                  = Proxy_XInputGetState                  @4
+    XInputSetState                  = Proxy_XInputSetState                  @5

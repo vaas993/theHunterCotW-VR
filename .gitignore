@@ -1,0 +1,57 @@
+# WHAT NEVER LEAVES THIS MACHINE.
+#
+# git publishes everything it is not told to ignore, so this file is the list of
+# what stays private - and it is written as a whitelist of exclusions rather
+# than trusting anyone to remember at commit time. Roughly 2.3 GB of this folder
+# is not source code and must not be in a public repository.
+
+# --- other people's software -------------------------------------------------
+# The build needs these SDKs, but redistributing them is not ours to do. Anyone
+# building the mod downloads them - BUILDING.md says which and where.
+# NVIDIA's DLSS SDK in particular has its own licence; the runtime DLL is
+# redistributable inside a release, the SDK is a separate matter.
+/thirdparty/
+/modbuilder_2.7.2/
+/modbuilder_2.7.2.7z
+
+# Someone else's mod, downloaded for reference. Not ours to republish.
+/63 Field of View-*.zip
+
+# Cheat Engine tables written by other people, and the reverse-engineering
+# scratch work built on them.
+/cheat engine/
+/research/
+/mods/
+
+# --- build output ------------------------------------------------------------
+/build/
+/launcher/build/
+/launcher/dist/
+__pycache__/
+*.pyc
+*.obj
+*.pdb
+*.exp
+*.ilk
+
+# --- releases ----------------------------------------------------------------
+# The zips belong on the Releases page, not in the repository: git keeps every
+# version of every file forever, so a 39 MB binary committed twice is 78 MB in
+# the history of everyone who ever clones it.
+/release/
+/nexus/
+/discord/
+
+# --- this machine's own state ------------------------------------------------
+/backups/
+/github/
+/.claude/
+*.log
+scan_addresses.txt
+scratch_entries.txt
+cotwvr.ini
+cotwvr_launcher.cfg
+
+# Page art, not source. 5.8 MB of images that belong on a mod page, and
+# their filenames say more about how they were made than anyone needs.
+/media/
