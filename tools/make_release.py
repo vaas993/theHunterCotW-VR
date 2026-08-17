@@ -246,6 +246,11 @@ def main():
     print()
     print("   %s  %.1f MB" % (os.path.basename(zip_path),
                               os.path.getsize(zip_path) / 1048576.0))
+    print()
+    print("   BEFORE PUBLISHING: upload this zip to virustotal.com and swap the")
+    print("   scan link in README.md and tools/make_nexus_description.py - the")
+    print("   old link points at the OLD zip, and a scan that does not match the")
+    print("   download is worse than none.")
     return 1 if unknown else 0
 
 

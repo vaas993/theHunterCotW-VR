@@ -75,7 +75,8 @@ Everything can be rebound in the panel, and the panel works with a gamepad.
 
 ## Antivirus warnings
 
-Some scanners flag the mod. That is expected for what it is: it loads into the
+**5 of 66 engines** flag the current release; 61 pass it clean. The flags are
+expected for what this is: it loads into the
 game through a proxy DLL and patches engine code in memory to render per eye —
 DLL injection plus code hooking, which is what heuristics look for — and the
 settings window is a bundled Python program, flagged for the same

@@ -170,7 +170,8 @@ this build. It identifies the game by fingerprint and refuses to guess.
 [line]
 
 %(h_av)s
-Antivirus software may flag this mod, and here is why, in the open: it loads
+[b]5 of 66 engines[/b] on VirusTotal flag the current release; 61 pass it
+clean. The flags are expected, and here is why, in the open: it loads
 into the game through a proxy DLL and patches engine code in memory to move the
 camera per eye - DLL injection and code hooking, which is exactly what heuristic
 scanners look for. The settings window is a bundled Python program, which gets
