@@ -477,3 +477,61 @@ readers, the question "does anyone need this?" must exist once.* Any version of
 it that is restated per writer is a set of lists that agree only until someone
 adds a reader — and the failure is silent, because every switch involved does
 exactly what it says.
+
+## Supporting a second game build, by measurement rather than by hand (2026-08-24)
+
+The mod's addresses are RVAs into one executable, so a different build of the
+game moved every one of them and the fingerprint check refused everything. Three
+different builds turned up within two days, so the question stopped being "port
+this one" and became "how is an address found on a build nobody has seen".
+
+**The method, and why each step exists:**
+
+1. **Signatures with the linker's bytes masked out.** Two builds of the same
+   source differ wherever the compiler encoded something *relative* - `call
+   rel32`, `mov rax,[rip+disp]`, `movabs`. Mask those operand bytes and the
+   pattern describes the INSTRUCTIONS rather than the layout. A first attempt
+   using raw bytes matched 25 of 62 with 9 ambiguous; masking took it to
+   **33 of 33 code addresses, none ambiguous, none missing**.
+2. **Duplicated functions are found by their caller.** `kBuildTransformA/B` have
+   identical twins elsewhere in the image, so no pattern of their own bytes can
+   ever identify them. A unique call site can, and following its `rel32` gives
+   the function.
+3. **Globals are found through the code that reads them.** A pointer has no code
+   to match, but `mov rax,[rip+disp]` does. Signature the reader with its
+   displacement masked, find it in the target, then decode the displacement it
+   carries *there*. Twelve readers were required to agree on each - a global
+   resolved twelve independent ways is one you can trust.
+4. **Then verify, because a unique match is not proof.** A pattern occurring
+   once in each image does not make the two the same routine. Every pair was
+   disassembled in both builds and required to agree instruction for
+   instruction, modulo linker-chosen operands. 33 matched exactly.
+
+**Two independent checks that the mapping was real, not coincidence:**
+
+* The deltas grow **monotonically with address** - `-0x50`, `-0x90`, `-0xB0`,
+  `-0x180` across a wide range, `-0x570`, `-0x700`. That is what accumulated
+  size differences look like. Wrong matches scatter.
+* **Struct offsets needed no porting at all**, and this came free: offsets like
+  `[rcx+0x1d0]` are *part of* the instructions being compared, so 33 identical
+  routines IS the evidence that the offsets did not move.
+
+**MY OWN INSTRUMENTS LIED TWICE, both caught by self-tests:**
+
+* the verifier reported the weather getter as a mismatch because it demanded 5
+  instructions and the function is 2 - `movss xmm0,[rcx+0x1d0] / ret`,
+  byte-identical in both builds. **Requiring length rather than agreement turns
+  a perfect match into a failure.**
+* it also disassembled *data* globals as code and judged them on the garbage.
+
+Before that, two privacy scanners had reported a repository "clean" on patterns
+their regexes could never match, because the shell mangled the backslashes.
+**The rule earned three times over: a negative result counts only after the
+instrument has caught a planted positive.**
+
+**The shape it left behind:** `apex_addresses.def`, one column per build,
+generated. The 36 constants in `apex.h` became runtime values selected at
+startup by fingerprint - the documentation of how each was found stayed exactly
+where it was. A third build is one more column, not fifty edits. An unlisted
+build is still refused outright, which is the behaviour that made the whole
+thing safe to attempt.

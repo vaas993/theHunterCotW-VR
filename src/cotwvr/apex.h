@@ -32,6 +32,41 @@ namespace apex {
 constexpr uint32_t kExpectedSizeOfImage = 0x02A13000;
 constexpr uint32_t kExpectedTimestamp   = 0x6A5A5133u;  // 2026-07-17 15:58:43 UTC
 
+// *** MORE THAN ONE BUILD OF THE GAME IS SUPPORTED. ***
+//
+// The addresses below are RVAs, so they belong to one specific executable, and
+// a second build of the same game moves every one of them. Rather than refuse
+// everything on anything but the original, each build the addresses have been
+// ESTABLISHED for gets a column in apex_addresses.def, and Init() picks the
+// column by fingerprint.
+//
+// "Established" means measured, not assumed: signatures with the linker-chosen
+// operand bytes masked out (tools/make_signatures.py), duplicated routines
+// reached through a unique caller and globals through the instructions that
+// read them (tools/port_build.py), and then every pair disassembled in both
+// builds and required to agree instruction for instruction
+// (tools/verify_port.py). An unlisted build is still refused outright.
+struct KnownBuild {
+    uint32_t    sizeOfImage;
+    uint32_t    timestamp;
+    const char* name;
+};
+constexpr KnownBuild kKnownBuilds[] = {
+    {0x02A13000, 0x6A5A5133u, "2026-07-17 (game update 9.2)"},
+    {0x02A13000, 0x6A0680A9u, "2026-05-15"},
+};
+constexpr int kKnownBuildCount = int(sizeof(kKnownBuilds) / sizeof(kKnownBuilds[0]));
+
+// Which column Init() selected, or -1 when the build is not one we know.
+int  BuildIndex();
+const char* BuildName();
+
+// The addresses themselves - runtime values now, one set per build. Every
+// declaration below is written out by tools/emit_build_table.py.
+#define APEX_ADDR(name, b0, b1) extern uint32_t name;
+#include "apex_addresses.def"
+#undef APEX_ADDR
+
 bool Init();                 // resolve module base, check fingerprint
 uintptr_t Base();            // image base of theHunterCotW_F.exe, 0 until Init
 bool FingerprintMatches();   // false = game updated; RVA features must stay off
@@ -63,8 +98,8 @@ void* Rva(uint32_t rva);
 // These are GENERIC math helpers - A has 7 direct call sites, B has 36 - so the
 // player camera is one caller among many and must be identified at runtime.
 // That is what camera_probe.cpp does.
-constexpr uint32_t kBuildTransformA = 0x000D8570;   // .. 0x000D8740
-constexpr uint32_t kBuildTransformB = 0x000D8740;   // .. 0x000D8910
+extern uint32_t kBuildTransformA;   // per build - see apex_addresses.def   // .. 0x000D8740
+extern uint32_t kBuildTransformB;   // per build - see apex_addresses.def   // .. 0x000D8910
 
 // THE PLAYER CAMERA, identified by MEASUREMENT (camera_probe, 2026-08-01,
 // 35,400 frames of walking and looking).  This is the RETURN address of the
@@ -86,8 +121,8 @@ constexpr uint32_t kBuildTransformB = 0x000D8740;   // .. 0x000D8910
 //     OpenXR, which makes the basis change far cheaper than Far Cry 2's Z-up
 //     Dunia.
 //   * world units are METRES, so IPD and 6DOF need no scale factor.
-constexpr uint32_t kCameraBuildCaller = 0x006DBDC8;   // return address
-constexpr uint32_t kCameraBuildCallerFn = 0x006DBB3A; // the function it lives in
+extern uint32_t kCameraBuildCaller;   // per build - see apex_addresses.def   // return address
+extern uint32_t kCameraBuildCallerFn;   // per build - see apex_addresses.def // the function it lives in
 
 // THE SITE THAT ACTUALLY MOVES THE PICTURE, found by displacing each call site
 // in turn at runtime and having a human look (2026-08-01).  Displacing all six
@@ -104,8 +139,8 @@ constexpr uint32_t kCameraBuildCallerFn = 0x006DBB3A; // the function it lives i
 // transform at 0x004B6F11, which does nothing when displaced.  Two sites at
 // the same position where only one steers the picture is exactly why this had
 // to be measured rather than reasoned about.
-constexpr uint32_t kCameraMoverCaller = 0x006445CC;
-constexpr uint32_t kCameraMoverCallerFn = 0x00642E80;
+extern uint32_t kCameraMoverCaller;   // per build - see apex_addresses.def
+extern uint32_t kCameraMoverCallerFn;   // per build - see apex_addresses.def
 
 // *** WHERE THE AIM IS BUILT, AND WHY THE WEAPON DID NOT FOLLOW THE HEAD. ***
 //
@@ -135,7 +170,7 @@ constexpr uint32_t kCameraMoverCallerFn = 0x00642E80;
 // Argument count read off the CALL SITE, never the prologue - rcx=rsi,
 // rdx=r15, r8=camera, r9d=byte, [rsp+0x20]=float. FIVE arguments. Getting this
 // wrong has crashed this game four times.
-constexpr uint32_t kAimConsumer = 0x0063C0A0;   // .. 0x0063C0D9
+extern uint32_t kAimConsumer;   // per build - see apex_addresses.def   // .. 0x0063C0D9
 constexpr uint32_t kAimYawOffset = 0x4C;        // accumulated yaw, radians
 constexpr uint32_t kAimPitchOffset = 0x50;      // pitch, radians
 
@@ -214,11 +249,11 @@ constexpr uint32_t kAimInputPitch = 0x20;
 //
 // One caller means no return-address filter is needed: neutralise our offset for
 // the duration of this call and the engine saves its own value, unpolluted.
-constexpr uint32_t kSaveAimCopy = 0x004993E0;
+extern uint32_t kSaveAimCopy;   // per build - see apex_addresses.def
 
-constexpr uint32_t kEulerToMatrix = 0x004A6770;
-constexpr uint32_t kEulerToMatrixRetLive = 0x00644260;
-constexpr uint32_t kEulerToMatrixRetCopy = 0x006442CC;
+extern uint32_t kEulerToMatrix;   // per build - see apex_addresses.def
+extern uint32_t kEulerToMatrixRetLive;   // per build - see apex_addresses.def
+extern uint32_t kEulerToMatrixRetCopy;   // per build - see apex_addresses.def
 
 // *** THE CALL SITE THAT BUILDS THE VIEW - the one never hooked. ***
 //
@@ -240,7 +275,7 @@ constexpr uint32_t kEulerToMatrixRetCopy = 0x006442CC;
 // the aim at its START and again at its END, and aiming is a camera transition
 // like any other. So no amount of writing into the aim can win; the offset has
 // to live somewhere the engine never samples.
-constexpr uint32_t kEulerToMatrixRetView = 0x0049E8F1;
+extern uint32_t kEulerToMatrixRetView;   // per build - see apex_addresses.def
 
 // *** WHERE A ROTATED MATRIX GETS BAKED BACK INTO AN ANGLE. ***
 //
@@ -254,8 +289,8 @@ constexpr uint32_t kEulerToMatrixRetView = 0x0049E8F1;
 // something of ours in it, so the same instruction that was innocent becomes the
 // one that stores our offset as the player's aim. Signature reads off the call
 // site: rcx is the destination euler, rdx the source matrix.
-constexpr uint32_t kMatrixToEuler = 0x004B2560;
-constexpr uint32_t kMatrixToEulerRetBake = 0x004B7210;
+extern uint32_t kMatrixToEuler;   // per build - see apex_addresses.def
+extern uint32_t kMatrixToEulerRetBake;   // per build - see apex_addresses.def
 
 // *** THE BAKE, FOUND AT LAST - AND BY THE GAME ITSELF, NOT BY REASONING. ***
 //
@@ -284,12 +319,12 @@ constexpr uint32_t kMatrixToEulerRetBake = 0x004B7210;
 // rcx is the aim object: `mov rbx, rcx` at 0x0063874D. At least three arguments
 // (rcx, rdx, r8 - r8 goes to rbp at 0x00638757); the prologue writes only the
 // shadow space, so nothing is passed on the stack.
-constexpr uint32_t kAimReseed = 0x00638730;        // .. 0x00638972
+extern uint32_t kAimReseed;   // per build - see apex_addresses.def        // .. 0x00638972
 
 // The single instruction the whole ratchet comes down to, and the one the code
 // cave detours. Six bytes, which is one more than a rel32 jump needs:
 //   0x006388CC  f3 44 0f 11 43 1c   movss [rbx+0x1c], xmm8
-constexpr uint32_t kReseedAccumWrite = 0x006388CC;
+extern uint32_t kReseedAccumWrite;   // per build - see apex_addresses.def
 
 // *** THE SECOND RE-SEED - HOLD BREATH. ***
 //
@@ -321,8 +356,8 @@ constexpr uint32_t kReseedAccumWrite = 0x006388CC;
 // these detours steal nothing and need no padding - easier than
 // kReseedAccumWrite, which had to swallow 11. A full-image scan found no branch
 // landing anywhere inside the block.
-constexpr uint32_t kHoldBreathReseedYaw   = 0x00643DE8;
-constexpr uint32_t kHoldBreathReseedPitch = 0x00643DF9;
+extern uint32_t kHoldBreathReseedYaw;   // per build - see apex_addresses.def
+extern uint32_t kHoldBreathReseedPitch;   // per build - see apex_addresses.def
 
 constexpr uint32_t kAimLatchByte = 0xBC;   // on the aim object: 0 = about to copy
 constexpr uint32_t kAimLatchDest = 0x5C;   // where camera+0x4C is copied to
@@ -336,7 +371,7 @@ constexpr uint32_t kTimeMultOffset = 0xF4;         // float, time speed
 
 // Weather has no global - a bare leaf accessor with `this` in rcx, so the
 // pointer has to be caught as it goes past. AOB `F3 0F 10 81 D0 01 00 00 C3`.
-constexpr uint32_t kWeatherSpeedGetter = 0x002FB6B0;  // movss xmm0,[rcx+0x1D0]
+extern uint32_t kWeatherSpeedGetter;   // per build - see apex_addresses.def  // movss xmm0,[rcx+0x1D0]
 constexpr uint32_t kWeatherSpeedOffset = 0x1D0;       // float
 
 // AXIS TEST RESULT (2026-08-01, displacing kCameraMoverCaller 5 m and asking a
@@ -358,8 +393,10 @@ constexpr uint32_t kWeatherSpeedOffset = 0x1D0;       // float
 // the CAMERA site (which tracks the view perfectly) and apply the offset at the
 // MOVER site (which is what actually steers the picture).  Two different
 // objects, one for reading orientation and one for writing position.
-constexpr uint32_t kCameraBasisSource = kCameraBuildCaller;   // read orientation here
-constexpr uint32_t kCameraPositionLever = kCameraMoverCaller; // write position here
+// References, not copies: the two they alias are chosen per build at startup,
+// so a copy taken at compile time would still hold build 0's address.
+extern uint32_t& kCameraBasisSource;      // read orientation here
+extern uint32_t& kCameraPositionLever;    // write position here
 
 // THE PER-FRAME RENDER FUNCTION - the thing full-rate stereo calls twice.
 //
@@ -404,8 +441,8 @@ constexpr uint32_t kCameraPositionLever = kCameraMoverCaller; // write position 
 // first-person pass does NOT build its transform through these helpers, and
 // giving the weapon stereo depth needs the render view/projection itself
 // (the D3D11 constant buffer), not a transform-builder call site.
-constexpr uint32_t kRenderFrame = 0x007B9D30;      // .. 0x007BA7CC
-constexpr uint32_t kRenderFrameEnd = 0x007BA7CC;
+extern uint32_t kRenderFrame;   // per build - see apex_addresses.def      // .. 0x007BA7CC
+extern uint32_t kRenderFrameEnd;   // per build - see apex_addresses.def
 
 // DRAW THE SCENE - void __fastcall(void* this), 515 bytes.
 //
@@ -444,7 +481,7 @@ constexpr uint32_t kRenderFrameEnd = 0x007BA7CC;
 // records four crashes from getting argument counts wrong in exactly this
 // neighbourhood. An entry detour that calls the original and then edits
 // lensOut is safe, and is the whole of the change.
-constexpr uint32_t kCamModUpdate = 0x00642E80;
+extern uint32_t kCamModUpdate;   // per build - see apex_addresses.def
 
 // *** THE TAA JITTER GENERATOR - found by the ladder hunt of 2026-08-12 ***
 // (jitterhunt.cpp: memory scan -> hwbp write-watch x3 -> disassembly).
@@ -459,12 +496,12 @@ constexpr uint32_t kCamModUpdate = 0x00642E80;
 // pass - derives from this ONE call, which is why detouring it is the
 // self-consistent way to own the jitter (DLSS_IMPLEMENTATION.md 7e). No
 // float args, bool return: a safe C++ signature, rare in this exe.
-constexpr uint32_t kJitterGenerator = 0x0012DFB0;
+extern uint32_t kJitterGenerator;   // per build - see apex_addresses.def
 // The frame counter both stock modes index by (mode 2: &1, mode 3: &15).
 constexpr uint32_t kJitterFrameCounter = 0x025AFB30;
 
-constexpr uint32_t kRenderScene = 0x007C0DE0;      // .. 0x007C0FE3
-constexpr uint32_t kRenderSceneEnd = 0x007C0FE3;
+extern uint32_t kRenderScene;   // per build - see apex_addresses.def      // .. 0x007C0FE3
+extern uint32_t kRenderSceneEnd;   // per build - see apex_addresses.def
 
 // SUBMIT THE SCENE - void __fastcall(void* desc), 79 bytes, one argument.
 // Called by the frame driver at 0x007BA6F5 with the SAME stack buffer the build
@@ -475,7 +512,7 @@ constexpr uint32_t kRenderSceneEnd = 0x007C0FE3;
 // The pair matters: kRenderScene only FILLS a description; kSubmitScene
 // consumes it.  Calling the build twice just overwrites the description, which
 // is why "draw the scene twice" was the wrong mental model.
-constexpr uint32_t kSubmitScene = 0x0080C780;      // .. 0x0080C7CF
+extern uint32_t kSubmitScene;   // per build - see apex_addresses.def      // .. 0x0080C7CF
 
 // THE PRESENT PATH - called by the frame driver at 0x007BA701 as:
 //     movaps xmm1, xmm9      ; a 128-bit second argument
@@ -489,7 +526,7 @@ constexpr uint32_t kSubmitScene = 0x0080C780;      // .. 0x0080C7CF
 //
 // Declared with __m128 rather than float: the caller uses MOVAPS, so all 128
 // bits are meaningful and narrowing it to a float would drop three lanes.
-constexpr uint32_t kPresentPath = 0x00797420;
+extern uint32_t kPresentPath;   // per build - see apex_addresses.def
 
 // THE FRAME CLOCK. The present path opens by calling 0x00143330 (the clock
 // update) and then computing a delta from two global counters:
@@ -577,7 +614,7 @@ constexpr uint32_t kTimeBaselineOffset    = 0x70;   // uint64, QPC ticks
 // One argument, rcx = the object; both call sites read set nothing else:
 //     503283  mov rcx, [rip+0x219CD66]
 //     50328A  call 0x1400EB040
-constexpr uint32_t kTimerTick = 0x000EB040;
+extern uint32_t kTimerTick;   // per build - see apex_addresses.def
 
 // THE DELTA GETTER - the one place every consumer of the frame delta goes
 // through, and therefore the right place to correct it.
@@ -592,14 +629,14 @@ constexpr uint32_t kTimerTick = 0x000EB040;
 // `mov rcx,[global]`), returning a float in xmm0. It reads a field and nothing
 // else, so replacing its RESULT is safe in a way that rewriting the field, the
 // baseline or the counter all turned out not to be.
-constexpr uint32_t kTimeGetter = 0x000EB270;
+extern uint32_t kTimeGetter;   // per build - see apex_addresses.def
 
 // The SECOND getter, returning +0x20, same shape:
 //   EB024  cmp   byte [rcx+0x30], dl
 //   EB032  movss xmm0, [rcx+0x20]
 // Different subsystems read different getters. Correcting only the first fixed
 // the player and left the in-game UI slow, which is how this one was found.
-constexpr uint32_t kTimeGetter2 = 0x000EB020;
+extern uint32_t kTimeGetter2;   // per build - see apex_addresses.def
 
 // THE ONLY TWO PLACES THE ENGINE ASKS FOR THE FRAME DELTA - measured by
 // capturing the return address inside the getter, not by reading code. Both sit
@@ -610,8 +647,8 @@ constexpr uint32_t kTimeGetter2 = 0x000EB020;
 //   7B9E71  call 0x1400EB270   (dl=1)  -> xmm11
 //
 // The return addresses are the instruction AFTER each call.
-constexpr uint32_t kDeltaReadA = 0x007B9E5B;
-constexpr uint32_t kDeltaReadB = 0x007B9E76;
+extern uint32_t kDeltaReadA;   // per build - see apex_addresses.def
+extern uint32_t kDeltaReadB;   // per build - see apex_addresses.def
 
 // THE CLOCK UPDATE, and the right place to stop this problem rather than repair
 // it. The present path's very first act:
@@ -623,7 +660,7 @@ constexpr uint32_t kDeltaReadB = 0x007B9E76;
 // SKIPPING IT DURING THE REPLAY WAS TRIED AND IS WRONG: the world flickered
 // black, so this call does RENDER work as well as timing and the second eye
 // needs it. Hooked, but passed straight through by default.
-constexpr uint32_t kClockUpdate = 0x00143330;
+extern uint32_t kClockUpdate;   // per build - see apex_addresses.def
 
 // ---------------------------------------------------------------------------
 // TOBII "EXTENDED VIEW" - THE GAME SHIPS ITS OWN HEAD TRACKING.
@@ -662,9 +699,9 @@ constexpr uint32_t kClockUpdate = 0x00143330;
 // string at 0x01A30070 and runs per frame) READ-ONLY, log its `this`, and check
 // whether +0x3C0..0x3CC looks like the pose block.
 // READ ITS CALL SITE FOR THE ARGUMENT COUNT BEFORE HOOKING IT.
-constexpr uint32_t kTobiiPoseCallback = 0x0010E620;   // .. 0x0010E961
-constexpr uint32_t kTobiiExtendedViewUpdate = 0x004390D0;  // .. 0x0043A5D9
-constexpr uint32_t kTobiiExtViewCaller = 0x009D1000;  // .. 0x009D1262
+extern uint32_t kTobiiPoseCallback;   // per build - see apex_addresses.def   // .. 0x0010E961
+extern uint32_t kTobiiExtendedViewUpdate;   // per build - see apex_addresses.def  // .. 0x0043A5D9
+extern uint32_t kTobiiExtViewCaller;   // per build - see apex_addresses.def  // .. 0x009D1262
 // THE MANAGER OBJECT, straight out of a global - no hook needed to get it.
 // Read off the Extended View call site at 0x009D1227:
 //     xor  r8d, r8d               ; arg3 = 0

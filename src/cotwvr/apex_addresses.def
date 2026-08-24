@@ -1,0 +1,56 @@
+// EVERY ENGINE ADDRESS, ONCE PER BUILD.  *** GENERATED - see below. ***
+//
+// The mod's addresses are RVAs into theHunterCotW_F.exe, and a different build
+// of the game moves them. This table carries one column per build the addresses
+// have been established for; apex.cpp picks a column at startup by fingerprint,
+// and every feature then uses the same names it always did.
+//
+// Regenerate with:
+//     python tools/make_signatures.py <reference.exe> <target.exe> --json build/port_X.json
+//     python tools/port_build.py      <reference.exe> <target.exe>
+//     python tools/emit_build_table.py
+//
+// Each column was VERIFIED, not guessed: tools/verify_port.py disassembles both
+// builds at every pair and requires the instructions to agree on everything
+// except the operands a linker chooses. A signature match alone only proves a
+// pattern is unique; it does not prove the two are the same routine.
+//
+//          NAME                        BUILD 0             BUILD 1
+//                                      2026-07-17          2026-05-15
+//                                      (game update 9.2)
+APEX_ADDR(kBuildTransformA,            0x000D8570,         0x000D8520)
+APEX_ADDR(kBuildTransformB,            0x000D8740,         0x000D86F0)
+APEX_ADDR(kTimeGetter2,                0x000EB020,         0x000EAFD0)
+APEX_ADDR(kTimerTick,                  0x000EB040,         0x000EAFF0)
+APEX_ADDR(kTimeGetter,                 0x000EB270,         0x000EB220)
+APEX_ADDR(kTobiiPoseCallback,          0x0010E620,         0x0010E5D0)
+APEX_ADDR(kJitterGenerator,            0x0012DFB0,         0x0012DF20)
+APEX_ADDR(kClockUpdate,                0x00143330,         0x00143280)
+APEX_ADDR(kWeatherSpeedGetter,         0x002FB6B0,         0x002FB530)
+APEX_ADDR(kTobiiExtendedViewUpdate,    0x004390D0,         0x00438F50)
+APEX_ADDR(kSaveAimCopy,                0x004993E0,         0x00499260)
+APEX_ADDR(kEulerToMatrixRetView,       0x0049E8F1,         0x0049E771)
+APEX_ADDR(kEulerToMatrix,              0x004A6770,         0x004A65F0)
+APEX_ADDR(kMatrixToEuler,              0x004B2560,         0x004B23E0)
+APEX_ADDR(kMatrixToEulerRetBake,       0x004B7210,         0x004B7090)
+APEX_ADDR(kAimReseed,                  0x00638730,         0x006385B0)
+APEX_ADDR(kReseedAccumWrite,           0x006388CC,         0x0063874C)
+APEX_ADDR(kAimConsumer,                0x0063C0A0,         0x0063BF20)
+APEX_ADDR(kCameraMoverCallerFn,        0x00642E80,         0x00642D00)
+APEX_ADDR(kCamModUpdate,               0x00642E80,         0x00642D00)
+APEX_ADDR(kHoldBreathReseedYaw,        0x00643DE8,         0x00643C68)
+APEX_ADDR(kHoldBreathReseedPitch,      0x00643DF9,         0x00643C79)
+APEX_ADDR(kEulerToMatrixRetLive,       0x00644260,         0x006440E0)
+APEX_ADDR(kEulerToMatrixRetCopy,       0x006442CC,         0x0064414C)
+APEX_ADDR(kCameraMoverCaller,          0x006445CC,         0x0064444C)
+APEX_ADDR(kCameraBuildCallerFn,        0x006DBB3A,         0x006DB9BA)
+APEX_ADDR(kCameraBuildCaller,          0x006DBDC8,         0x006DBC48)
+APEX_ADDR(kPresentPath,                0x00797420,         0x007972A0)
+APEX_ADDR(kRenderFrame,                0x007B9D30,         0x007B9BB0)
+APEX_ADDR(kDeltaReadA,                 0x007B9E5B,         0x007B9CDB)
+APEX_ADDR(kDeltaReadB,                 0x007B9E76,         0x007B9CF6)
+APEX_ADDR(kRenderFrameEnd,             0x007BA7CC,         0x007BA64C)
+APEX_ADDR(kRenderScene,                0x007C0DE0,         0x007C0C60)
+APEX_ADDR(kRenderSceneEnd,             0x007C0FE3,         0x007C0E63)
+APEX_ADDR(kSubmitScene,                0x0080C780,         0x0080C210)
+APEX_ADDR(kTobiiExtViewCaller,         0x009D1000,         0x009D0900)

@@ -10,6 +10,29 @@ namespace {
 uintptr_t g_base = 0;
 size_t    g_size = 0;
 bool      g_match = false;
+int       g_build = -1;
+
+}  // namespace
+
+// One definition per address, defaulting to the build the mod was written
+// against. Init() re-points them if a different known build is running.
+#define APEX_ADDR(name, b0, b1) uint32_t name = b0;
+#include "apex_addresses.def"
+#undef APEX_ADDR
+
+namespace {
+
+void SelectBuild(int index) {
+    switch (index) {
+#define APEX_ADDR(name, b0, b1) name = b1;
+        case 1:
+#include "apex_addresses.def"
+            break;
+#undef APEX_ADDR
+        default:
+            break;      // column 0 is what every address already holds
+    }
+}
 
 }  // namespace
 
@@ -26,7 +49,17 @@ bool Init() {
     g_size = nt->OptionalHeader.SizeOfImage;
     const uint32_t stamp = nt->FileHeader.TimeDateStamp;
 
-    g_match = (g_size == kExpectedSizeOfImage) && (stamp == kExpectedTimestamp);
+    // Which of the known builds is this, if any?
+    for (int i = 0; i < kKnownBuildCount; ++i) {
+        if (g_size == kKnownBuilds[i].sizeOfImage &&
+            stamp == kKnownBuilds[i].timestamp) {
+            g_build = i;
+            break;
+        }
+    }
+    g_match = (g_build >= 0);
+    if (g_match) SelectBuild(g_build);
+
     const bool forced = !g_match && Cfg().apex_ignore_fingerprint;
     if (forced) g_match = true;
 
@@ -49,9 +82,19 @@ bool Init() {
                  "own risk. If the game crashes, set it back to 0.",
                  kExpectedSizeOfImage, kExpectedTimestamp);
     } else {
-        COTW_LOG("[apex] fingerprint OK - engine addresses are valid for this build");
+        COTW_LOG("[apex] fingerprint OK - build %d of %d, %s - engine addresses "
+                 "are valid for this build",
+                 g_build + 1, kKnownBuildCount, kKnownBuilds[g_build].name);
     }
     return true;
+}
+
+uint32_t& kCameraBasisSource   = kCameraBuildCaller;
+uint32_t& kCameraPositionLever = kCameraMoverCaller;
+
+int         BuildIndex()   { return g_build; }
+const char* BuildName()   {
+    return (g_build >= 0) ? kKnownBuilds[g_build].name : "unrecognised";
 }
 
 uintptr_t Base()          { return g_base; }
