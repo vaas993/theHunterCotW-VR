@@ -32,8 +32,8 @@ import capstone
 import pefile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from make_signatures import (APEX_H, MAX_BYTES, MIN_BYTES, build_pattern,
-                             count_matches, in_text, load)
+from make_signatures import (APEX_H, MAX_BYTES, MIN_BYTES, apex_rvas,
+                             build_pattern, count_matches, in_text, load)
 
 
 def md64():
@@ -192,10 +192,11 @@ def main():
     ref, tgt = load(args.reference), load(args.target)
     md = md64()
 
-    with open(APEX_H, encoding="utf-8") as f:
-        src = f.read()
-    rvas = [(m.group(1), int(m.group(2), 16)) for m in
-            re.finditer(r"constexpr uint32_t (k\w+)\s*=\s*(0x[0-9A-Fa-f]+)\s*;", src)]
+    # apex_rvas() reads BOTH apex.h and apex_addresses.def. Reading only the
+    # header made this skip every per-build address in silence - the section
+    # printed no rows at all, which reads as "nothing to do" rather than
+    # "looked in the wrong file".
+    rvas = apex_rvas()
 
     # The three phase-one leftovers, and the data globals worth having.
     NOT_UNIQUE = ["kBuildTransformA", "kBuildTransformB", "kTobiiExtendedViewUpdate"]
@@ -211,6 +212,7 @@ def main():
             continue
         rva = by_name.get(name)
         if rva is None:
+            print("  %-26s NOT FOUND in apex.h or apex_addresses.def" % name)
             continue
         # first: is it duplicated in the REFERENCE, or just undistinctive?
         pat, mask = build_pattern(ref, rva, md)
@@ -232,6 +234,7 @@ def main():
             continue
         rva = by_name.get(name)
         if rva is None:
+            print("  %-26s NOT FOUND in apex.h or apex_addresses.def" % name)
             continue
         got, why = resolve_global(ref, tgt, md, name, rva)
         if got:

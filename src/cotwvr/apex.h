@@ -51,9 +51,13 @@ struct KnownBuild {
     uint32_t    timestamp;
     const char* name;
 };
+// SizeOfImage AND timestamp together, because neither alone separates these:
+// builds 0 and 2 share a PE timestamp and differ only in image size, which is
+// exactly the trap that made a differently-linked build look identical.
 constexpr KnownBuild kKnownBuilds[] = {
     {0x02A13000, 0x6A5A5133u, "2026-07-17 (game update 9.2)"},
     {0x02A13000, 0x6A0680A9u, "2026-05-15"},
+    {0x02A14000, 0x6A5A5133u, "2026-07-17, second link"},
 };
 constexpr int kKnownBuildCount = int(sizeof(kKnownBuilds) / sizeof(kKnownBuilds[0]));
 
@@ -63,7 +67,7 @@ const char* BuildName();
 
 // The addresses themselves - runtime values now, one set per build. Every
 // declaration below is written out by tools/emit_build_table.py.
-#define APEX_ADDR(name, b0, b1) extern uint32_t name;
+#define APEX_ADDR(name, b0, b1, b2) extern uint32_t name;
 #include "apex_addresses.def"
 #undef APEX_ADDR
 

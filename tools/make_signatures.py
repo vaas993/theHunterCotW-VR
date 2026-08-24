@@ -57,12 +57,29 @@ def load(path):
 
 
 def apex_rvas():
-    """Every `constexpr uint32_t kName = 0x...;` in apex.h, in file order."""
+    """Every engine address, from BOTH places they now live.
+
+    Addresses that vary per build moved out of apex.h into apex_addresses.def
+    when two-build support landed; the ones that are the same everywhere
+    (struct offsets, unmoved globals) are still constexpr in the header. A tool
+    that reads only the header therefore found nothing to port and reported
+    "0 of 26" - which looked like a build with no matching code at all, rather
+    than a scanner looking in the wrong file.
+
+    Column 0 of the .def is the reference build, which is what a signature is
+    taken from.
+    """
+    out = []
     with open(APEX_H, encoding="utf-8") as f:
         src = f.read()
-    out = []
     for m in re.finditer(r"constexpr uint32_t (k\w+)\s*=\s*(0x[0-9A-Fa-f]+)\s*;", src):
         out.append((m.group(1), int(m.group(2), 16)))
+
+    defs = os.path.join(os.path.dirname(APEX_H), "apex_addresses.def")
+    if os.path.exists(defs):
+        with open(defs, encoding="utf-8") as f:
+            for m in re.finditer(r"APEX_ADDR\(\s*(k\w+)\s*,\s*(0x[0-9A-Fa-f]+)", f.read()):
+                out.append((m.group(1), int(m.group(2), 16)))
     return out
 
 

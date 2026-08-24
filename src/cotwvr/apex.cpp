@@ -16,7 +16,7 @@ int       g_build = -1;
 
 // One definition per address, defaulting to the build the mod was written
 // against. Init() re-points them if a different known build is running.
-#define APEX_ADDR(name, b0, b1) uint32_t name = b0;
+#define APEX_ADDR(name, b0, b1, b2) uint32_t name = b0;
 #include "apex_addresses.def"
 #undef APEX_ADDR
 
@@ -24,11 +24,16 @@ namespace {
 
 void SelectBuild(int index) {
     switch (index) {
-#define APEX_ADDR(name, b0, b1) name = b1;
         case 1:
+#define APEX_ADDR(name, b0, b1, b2) name = b1;
 #include "apex_addresses.def"
-            break;
 #undef APEX_ADDR
+            break;
+        case 2:
+#define APEX_ADDR(name, b0, b1, b2) name = b2;
+#include "apex_addresses.def"
+#undef APEX_ADDR
+            break;
         default:
             break;      // column 0 is what every address already holds
     }
