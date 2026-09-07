@@ -60,6 +60,13 @@ foreach ($c in @("default_first_person.ctunec", "prone_first_person.ctunec",
         Write-Host "  removed dropzone override $c" -ForegroundColor Yellow
     }
 }
+# The settings window is a folder now.
+$launcherDir = Join-Path $Game "VR Settings"
+if (Test-Path $launcherDir) {
+    Remove-Item $launcherDir -Recurse -Force
+    Write-Host "  removed VR Settings\" -ForegroundColor Yellow
+}
+
 $oldAssets = Join-Path $Game "cotwvr_assets"
 if (Test-Path $oldAssets) { Remove-Item $oldAssets -Recurse -Force }
 

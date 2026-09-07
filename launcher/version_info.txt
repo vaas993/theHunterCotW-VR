@@ -1,0 +1,31 @@
+# Version resource for the settings window.
+#
+# WHY THIS EXISTS: the exe shipped with every field blank - no publisher, no
+# description, no version. Heuristic scanners weigh that, because real software
+# fills it in and hastily-packed malware does not, and the mod is already
+# fighting an uphill battle as an unsigned PyInstaller bundle. It costs nothing
+# to say truthfully what this program is and who wrote it.
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(1, 2, 0, 0),
+    prodvers=(1, 2, 0, 0),
+    mask=0x3f, flags=0x0, OS=0x40004, fileType=0x1, subtype=0x0,
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo([
+      StringTable('040904B0', [
+        StringStruct('CompanyName',      'Vaas993'),
+        StringStruct('FileDescription',  'theHunter: Call of the Wild - VR settings'),
+        StringStruct('FileVersion',      '1.2.0.0'),
+        StringStruct('InternalName',     'cotwvr_launcher'),
+        StringStruct('LegalCopyright',   'Vaas993 - GPL-3.0'),
+        StringStruct('OriginalFilename', 'theHunterCotW VR Settings.exe'),
+        StringStruct('ProductName',      'theHunter Call of the Wild VR'),
+        StringStruct('ProductVersion',   '1.2.0.0'),
+        StringStruct('Comments',         'Open source: https://github.com/vaas993/theHunterCotW-VR')
+      ])
+    ]),
+    VarFileInfo([VarStruct('Translation', [1033, 1200])])
+  ]
+)

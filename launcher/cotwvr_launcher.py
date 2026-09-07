@@ -39,7 +39,7 @@ from tkinter import ttk, messagebox
 APP_ID = "518790"
 TITLE = "theHunter: Call of the Wild - VR settings"
 AUTHOR = "Vaas993"
-VERSION = "1.1.1"
+VERSION = "1.2"
 # The game build this was written against. NOT enforced anywhere - the mod finds
 # its addresses by fingerprint and says so in the log if it cannot - it is here
 # so a player on a later update knows which fact to check first.
@@ -98,10 +98,31 @@ WELCOME_POINTS = [
 # --------------------------------------------------------------------------
 
 def here():
-    """The folder this exe/script sits in - which is the game folder."""
-    if getattr(sys, "frozen", False):
-        return os.path.dirname(sys.executable)
-    return os.path.dirname(os.path.abspath(__file__))
+    """The GAME folder - which is not always the folder this exe sits in.
+
+    It used to be: a one-file build sat directly beside theHunterCotW_F.exe, so
+    "next to me" and "the game folder" were the same place. Folder mode puts the
+    exe one level down in its own directory, and taking the exe's folder then
+    points every path - cotwvr.ini included - at a subfolder that contains none
+    of them. The launcher would open, find no settings, and offer to save into
+    the wrong place.
+
+    So the game is LOOKED FOR rather than assumed: from the exe's folder
+    outwards, the first directory holding theHunterCotW_F.exe wins. That works
+    whichever way the launcher is installed, including someone who moves the exe
+    back up by hand.
+    """
+    start = (os.path.dirname(sys.executable) if getattr(sys, "frozen", False)
+             else os.path.dirname(os.path.abspath(__file__)))
+    probe = start
+    for _ in range(3):
+        if os.path.exists(os.path.join(probe, "theHunterCotW_F.exe")):
+            return probe
+        parent = os.path.dirname(probe)
+        if parent == probe:
+            break
+        probe = parent
+    return start          # no game found; behave exactly as before
 
 
 def notice_path():

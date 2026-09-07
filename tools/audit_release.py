@@ -70,8 +70,8 @@ def main():
         "cotwvr.dll": os.path.join(ROOT, "build", "cotwvr.dll"),
         "XINPUT9_1_0.dll": os.path.join(ROOT, "build", "XINPUT9_1_0.dll"),
         "openxr_loader.dll": os.path.join(ROOT, "build", "openxr_loader.dll"),
-        "theHunterCotW VR Settings.exe": os.path.join(
-            ROOT, "launcher", "dist", "theHunterCotW VR Settings.exe"),
+        os.path.join("VR Settings", "theHunterCotW VR Settings.exe"): os.path.join(
+            ROOT, "launcher", "dist", "VR Settings", "theHunterCotW VR Settings.exe"),
     }
     print("BINARIES")
     for name, src in built.items():
@@ -154,8 +154,13 @@ def main():
     else:
         with zipfile.ZipFile(zip_path) as z:
             inside = {i.filename: i.file_size for i in z.infolist()}
-        for name in os.listdir(folder):
-            size = os.path.getsize(os.path.join(folder, name))
+        on_disk = []
+        for root, _dirs, names in os.walk(folder):
+            for n in names:
+                full = os.path.join(root, n)
+                on_disk.append((os.path.relpath(full, folder).replace("\\", "/"), full))
+        for name, full in on_disk:
+            size = os.path.getsize(full)
             if name not in inside:
                 fails.append("%s is in the folder but not in the zip" % name)
             elif inside[name] != size:

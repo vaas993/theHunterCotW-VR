@@ -202,10 +202,28 @@ def main():
         (os.path.join(BUILD, "openxr_loader.dll"), "openxr_loader.dll"),
         (os.path.join(ROOT, "thirdparty", "dlss", "bin", "nvngx_dlss.dll"),
          "nvngx_dlss.dll"),
-        (os.path.join(LAUNCHER, "dist", "theHunterCotW VR Settings.exe"),
-         "theHunterCotW VR Settings.exe"),
         (os.path.join(ROOT, "release", "README.txt"), "README.txt"),
     ]
+
+    # The settings window is a FOLDER since folder mode replaced the one-file
+    # build - copied whole, because every file beside the exe is needed to run
+    # it. One-file was what the antivirus heuristics were reacting to.
+    launcher_src = os.path.join(LAUNCHER, "dist", "VR Settings")
+    launcher_dst = os.path.join(out_dir, "VR Settings")
+    if os.path.isdir(launcher_src):
+        if os.path.isdir(launcher_dst):
+            shutil.rmtree(launcher_dst)
+        shutil.copytree(launcher_src, launcher_dst)
+        n = sum(len(f) for _, _, f in os.walk(launcher_dst))
+        print("   %-32s %d files" % ("VR Settings\\", n))
+    else:
+        print("   [!] launcher folder not built: %s" % launcher_src)
+        return 1
+    # An older one-file exe left in the release folder would ship alongside it.
+    stale = os.path.join(out_dir, "theHunterCotW VR Settings.exe")
+    if os.path.exists(stale):
+        os.remove(stale)
+        print("       removed the old single-file launcher from the package")
 
     missing = [src for src, _ in files if not os.path.exists(src)]
     if missing:
@@ -241,8 +259,10 @@ def main():
 
     zip_path = out_dir + ".zip"
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
-        for name in sorted(os.listdir(out_dir)):
-            z.write(os.path.join(out_dir, name), name)
+        for root, _dirs, names in os.walk(out_dir):
+            for name in sorted(names):
+                full = os.path.join(root, name)
+                z.write(full, os.path.relpath(full, out_dir))
     print()
     print("   %s  %.1f MB" % (os.path.basename(zip_path),
                               os.path.getsize(zip_path) / 1048576.0))

@@ -24,7 +24,8 @@ $files = @("cotwvr.dll", "XINPUT9_1_0.dll", "openxr_loader.dll")
 # when PyInstaller runs, so it is deployed only when the built one differs from
 # the deployed one, and skipped in silence otherwise.
 $launcherName = "theHunterCotW VR Settings.exe"
-$launcherSrc = Join-Path (Split-Path $PSScriptRoot -Parent) "launcher\dist\$launcherName"
+$launcherDir = "VR Settings"    # folder mode: the exe lives one level down
+$launcherSrc = Join-Path (Split-Path $PSScriptRoot -Parent) "launcher\dist\$launcherDir"
 
 if (-not (Test-Path (Join-Path $Game "theHunterCotW_F.exe"))) {
     Write-Host "[!] theHunterCotW_F.exe not found in $Game" -ForegroundColor Red
@@ -63,25 +64,36 @@ foreach ($f in $files) {
 }
 
 if (Test-Path -LiteralPath $launcherSrc) {
-    $ldst = Join-Path $Game $launcherName
-    $lhs = (Get-FileHash -LiteralPath $launcherSrc -Algorithm SHA256).Hash
-    $lhd = if (Test-Path -LiteralPath $ldst) {
-        (Get-FileHash -LiteralPath $ldst -Algorithm SHA256).Hash } else { "" }
+    # A FOLDER now, not one file. Compare by the exe inside it, copy the whole
+    # thing when it differs. Folder mode is what got the launcher past the
+    # antivirus heuristics that a self-extracting one-file build attracts.
+    $ldst = Join-Path $Game $launcherDir
+    $srcExe = Join-Path $launcherSrc $launcherName
+    $dstExe = Join-Path $ldst $launcherName
+    $lhs = (Get-FileHash -LiteralPath $srcExe -Algorithm SHA256).Hash
+    $lhd = if (Test-Path -LiteralPath $dstExe) {
+        (Get-FileHash -LiteralPath $dstExe -Algorithm SHA256).Hash } else { "" }
     if ($lhs -ne $lhd) {
-        # The settings window may be open - it is not the game, so nothing above
-        # catches it, and a locked copy would otherwise fail the whole deploy.
         try {
-            Copy-Item -LiteralPath $launcherSrc -Destination $ldst -Force
-            $len = (Get-Item -LiteralPath $ldst).Length
-            $stamp = (Get-Item -LiteralPath $launcherSrc).LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
-            Write-Host ("  OK  {0,-20} {1,10:N0} bytes  built {2}  sha {3}" -f "VR Settings.exe", $len, $stamp, $lhs.Substring(0,12)) -ForegroundColor Green
+            if (Test-Path -LiteralPath $ldst) { Remove-Item -LiteralPath $ldst -Recurse -Force }
+            Copy-Item -LiteralPath $launcherSrc -Destination $ldst -Recurse -Force
+            $n = (Get-ChildItem -LiteralPath $ldst -Recurse -File).Count
+            Write-Host ("  OK  {0,-20} {1} files  sha {2}" -f "VR Settings\", $n, $lhs.Substring(0,12)) -ForegroundColor Green
         } catch {
-            Write-Host "  [!] could not replace $launcherName - close the settings window" -ForegroundColor Red
+            Write-Host "  [!] could not replace $launcherDir - close the settings window" -ForegroundColor Red
             $fail = $true
         }
     } else {
-        Write-Host ("  --  {0,-20} already current" -f "VR Settings.exe") -ForegroundColor DarkGray
+        Write-Host ("  --  {0,-20} already current" -f "VR Settings\") -ForegroundColor DarkGray
     }
+}
+
+# An older one-file install leaves the exe sitting in the game folder, where it
+# would still run and shadow the new one. Remove it once.
+$stray = Join-Path $Game $launcherName
+if (Test-Path -LiteralPath $stray) {
+    Remove-Item -LiteralPath $stray -Force -ErrorAction SilentlyContinue
+    Write-Host "  removed the old single-file launcher from the game folder" -ForegroundColor Yellow
 }
 
 if ($fail) { exit 1 }
