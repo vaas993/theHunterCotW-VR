@@ -2382,10 +2382,45 @@ void ReplaceReport() {
     frames = 0;
 }
 
+// *** TWO TEMPORAL MECHANISMS CANNOT BOTH OWN THE HISTORY. ***
+//
+// per_eye_temporal_history predates taa_replace_pass. It substitutes private
+// textures for the engine's temporal history; the replacement pass takes the
+// whole resolve over instead, and OWNS that history itself. With both on they
+// fight for the same textures every frame.
+//
+// Reported from a player's machine (GitHub #1, Quest 3S + Virtual Desktop): the
+// menus were perfect and gameplay was white flicker, then red and purple - a
+// temporal accumulator eating its own garbage, which is what a contested
+// history looks like. The mod SHIPS this off, so it took a hand-edited ini to
+// reach - but a setting that quietly destroys the picture when combined with
+// the feature everyone uses is a trap, not a setting.
+//
+// The replacement pass wins, because it is the one that works.
+bool PerEyeHistoryWanted() {
+    const Config& c = Cfg();
+    if (!c.per_eye_temporal_history) return false;
+    if (c.taa_replace_pass || c.dlss_enable) {
+        static bool moaned = false;
+        if (!moaned) {
+            moaned = true;
+            COTW_LOG("[taa] *** per_eye_temporal_history IS IGNORED. *** It is "
+                     "superseded by the replacement resolve, and running both "
+                     "makes them fight over the same history textures - which "
+                     "looks like flickering white or red/purple in gameplay "
+                     "while the menus stay clean. Set it to 0 in cotwvr.ini to "
+                     "silence this; nothing is lost, the newer pass does the "
+                     "same job properly.");
+        }
+        return false;
+    }
+    return true;
+}
+
 void FeatureReport() {
     static bool prevOn = false;
     static ULONGLONG last = 0;
-    const bool on = Cfg().per_eye_temporal_history;
+    const bool on = PerEyeHistoryWanted();
 
     if (!on) {
         if (prevOn) {
@@ -2445,7 +2480,7 @@ void FeatureReport() {
 // ---------------------------------------------------------------------------
 
 bool TaaWantsDraws() {
-    return Cfg().taa_probe || Cfg().per_eye_temporal_history ||
+    return Cfg().taa_probe || PerEyeHistoryWanted() ||
            Cfg().taa_replace_pass;
 }
 
@@ -2456,7 +2491,7 @@ void TaaOnDraw(ID3D11DeviceContext* ctx, UINT vertexCount) {
     if (t_inOurDraw) return;        // our own resolve, arriving back at the hook
 
     const bool probing = (g_armed != 0) || (g_waiting != 0);
-    const bool feature = Cfg().per_eye_temporal_history;
+    const bool feature = PerEyeHistoryWanted();
     const bool replacing = Cfg().taa_replace_pass;
     if ((!probing && !feature && !replacing) || !ctx) return;
     InterlockedIncrement(&g_drawsSeen);

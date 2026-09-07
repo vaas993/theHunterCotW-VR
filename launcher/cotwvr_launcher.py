@@ -1496,7 +1496,24 @@ class Launcher(tk.Tk):
             try:
                 self.status.config(text="starting the game...", foreground="#666")
                 self.update_idletasks()
-                self._watch_launch(subprocess.Popen([exe], cwd=here()), 0)
+                # *** DETACHED, OR THE LAUNCHER CANNOT CLEAN UP AFTER ITSELF. ***
+                #
+                # This window is a PyInstaller one-file exe: it unpacks itself
+                # into %TEMP%\_MEInnnnnn and deletes that on the way out. A
+                # child started the ordinary way INHERITS this process's open
+                # handles, so the game kept the unpacked folder busy and the
+                # delete failed - producing a "Failed to remove temporary
+                # directory" warning box at the exact moment the player is
+                # putting the headset on, which reads as the mod crashing.
+                #
+                # DETACHED_PROCESS plus close_fds hands the game nothing to
+                # hold, so the folder is free by the time the bootloader wants
+                # it back.
+                flags = (getattr(subprocess, "DETACHED_PROCESS", 0) |
+                         getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0))
+                proc = subprocess.Popen([exe], cwd=here(), close_fds=True,
+                                        creationflags=flags)
+                self._watch_launch(proc, 0)
                 return
             except OSError:
                 pass
