@@ -25,7 +25,7 @@ VERSION = "1.1.1"
 GAME_BUILD = "9.2 (Peru Hunting Reserve)"
 AUTHOR = "Vaas993"
 
-VIRUSTOTAL = "https://www.virustotal.com/gui/file/055e61b94789423e51c95a449ad7595b590904f806df7da31b765057d13b00f5"
+VIRUSTOTAL = "https://www.virustotal.com/gui/file/a890351d521b9bcfddf5ed30cc88f84cfca2e8c52dde064d09eeb753b298453a"
 DISCORD = "https://discord.gg/gbC9AkG2Xn"
 PATREON = "https://www.patreon.com/cw/Vaas993"
 PROFILE = "https://www.nexusmods.com/profile/Vaas993/mods"
@@ -172,7 +172,7 @@ this build. It identifies the game by fingerprint and refuses to guess.
 [line]
 
 %(h_av)s
-[b]3 of 66 engines[/b] on VirusTotal flag the download; 63 pass it clean. File
+[b]2 of 65 engines[/b] on VirusTotal flag the download; 63 pass it clean. File
 by file it is narrower still: the settings window and everything it needs scan
 [b]0 of 70[/b], as do the OpenXR loader and NVIDIA's own signed DLSS library.
 The only two flagged are [i]cotwvr.dll[/i] (1 of 70) and [i]XINPUT9_1_0.dll[/i]
@@ -184,7 +184,8 @@ is how the game loads this mod and also how a certain kind of malware works.
 cotwvr.dll then patches the engine's code in memory so it renders one eye at a
 time. Heuristic scanners recognise the TECHNIQUE - they are not identifying
 anything specific, which is why every major engine passes it and only the
-high-false-positive ones do not. Nothing is code-signed.
+high-false-positive ones do not. Both remaining hits are unnamed generic
+labels; no engine identifies a malware family. Nothing is code-signed.
 
 [list]
 [*][b]VirusTotal scan of this exact release:[/b] [url=%(vt)s]%(vt)s[/url]

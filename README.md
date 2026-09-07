@@ -76,7 +76,7 @@ Everything can be rebound in the panel, and the panel works with a gamepad.
 
 ## Antivirus warnings
 
-**3 of 66 engines** flag the download; 63 pass it clean. Scanned file by file,
+**2 of 65 engines** flag the download; 63 pass it clean. Scanned file by file,
 it is narrower than that:
 
 | File | Detections |
@@ -86,6 +86,9 @@ it is narrower than that:
 | `cotwvr.dll` | 1 / 70 |
 | `XINPUT9_1_0.dll` | 2 / 70 |
 
+Both remaining detections are unnamed generic labels from two of the highest
+false-positive engines in the set. No engine identifies a malware family.
+
 The two that are flagged are the two that do the actual work. `XINPUT9_1_0.dll`
 is a small DLL named after a system library that loads another DLL — which is
 how the game loads the mod, and also how a certain kind of malware works.
@@ -94,7 +97,7 @@ Heuristic scanners recognise the *technique*; they are not identifying anything
 in particular, which is why every major engine passes it and only high
 false-positive scanners do not. Nothing is code-signed.
 
-[VirusTotal scan of the current release](https://www.virustotal.com/gui/file/055e61b94789423e51c95a449ad7595b590904f806df7da31b765057d13b00f5) — and the entire source is in this
+[VirusTotal scan of the current release](https://www.virustotal.com/gui/file/a890351d521b9bcfddf5ed30cc88f84cfca2e8c52dde064d09eeb753b298453a) — and the entire source is in this
 repository: read it, or build it yourself with [BUILDING.md](BUILDING.md).
 
 ---
