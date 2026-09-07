@@ -151,7 +151,7 @@ void RecommendAct(int dir) {
         //
         // Picture: the mod's own resolve pass, with DLSS reconstructing on top.
         c.taa_replace_pass = true;
-        c.dlss_enable = true;
+        c.dlss_enable = false;   // opt-in: it needs an RTX card
         c.dlss_preset = 2;
         c.dlss_quality = 2;             // Balanced - the game draws 58% per axis
         c.dlss_upscale_solo = true;

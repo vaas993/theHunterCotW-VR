@@ -340,7 +340,7 @@ RECOMMENDED = {
     # that writes the motion vectors DLSS reconstructs from - so the two are one
     # control on this page and one control in the panel.
     "taa_replace_pass": "1",
-    "dlss_enable": "1",
+    "dlss_enable": "0",
     "dlss_preset": "2",         # M: the model that does not shimmer in this game
     "dlss_quality": "2",        # DLAA - upscaling is opt-in per machine
     "dlss_upscale_pct": "100",

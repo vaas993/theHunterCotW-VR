@@ -1286,7 +1286,17 @@ public:
     // luminance. Off only to prove what it is worth.
     bool  dlss_auto_exposure = true;
 
-    bool  dlss_enable = true;
+    // *** OFF BY DEFAULT, AND THE PASS BELOW STAYS ON. ***
+    //
+    // DLSS needs an NVIDIA RTX card. Shipping it on means everyone else starts
+    // with a switch that cannot do anything, and a first impression built on a
+    // feature their hardware will never run.
+    //
+    // taa_replace_pass stays ON, so the default is "Per-eye smoothing (mod)":
+    // the mod's own resolve, which works on any card of any brand and is what
+    // stops the game's own temporal pass blending each eye with the other eye's
+    // picture. RTX owners turn DLSS on in one row and get the better picture.
+    bool  dlss_enable = false;
     // *** THE JITTER IS WIRED NOW - AND REPORTING ZERO WAS A SPEC VIOLATION. ***
     //
     // The programming guide (3.7.3 rule 3) requires the per-frame sub-pixel
