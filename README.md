@@ -109,6 +109,15 @@ repository: read it, or build it yourself with [BUILDING.md](BUILDING.md).
 - **Leaning does not collide with anything** — 6DoF moves the camera, not the character, so lean far enough and you will lean through a wall. The travel limit in the panel is the guard.
 - **The scope's magnified picture is positioned from your head** — not from the gun - so holding free-look while aimed slides it off the scope.
 - **Sizes and shapes are worked out for a Quest 3** — other headsets run fine but may lose some field or waste pixels. Use the CUSTOM resolution and raise "How much wider" until it fills the view.
+- If theHunter VR starts flickering white or red/purple when DLSS is enabled, try this sequence—it worked for me:
+1. Close the game completely.
+2. Open cotwvr.ini in the game folder and set:dlss_enable = 0
+   taa_replace_pass = 1
+   per_eye_temporal_history = 0
+3. Launch the game and enter actual gameplay. Confirm that the image is stable with DLSS disabled.
+4. Close the game completely again.
+5. Relaunch, enter gameplay, and enable DLSS through the mod’s overlay.
+In my case, DLSS worked normally afterward without replacing any DLLs or changing the NVIDIA driver. Simply starting with DLSS already enabled had not helped previously.
 
 ---
 
