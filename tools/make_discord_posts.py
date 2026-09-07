@@ -68,7 +68,8 @@ PINNED_HELP = """# Reporting a problem with the VR mod
 Almost every question is answered by one file, so please start with it.
 
 **1. Get the log**
-Open **theHunterCotW VR Settings.exe** and press **Open log folder**, or go to:
+Open **VR Settings\theHunterCotW VR Settings.exe** and press
+**Open log folder**, or go to:
 `%%LOCALAPPDATA%%\\theHunterCotWVR`
 
 Attach **cotwvr.log**. If the problem happened on the run *before* the one you

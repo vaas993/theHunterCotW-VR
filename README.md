@@ -37,7 +37,8 @@ This is a work in progress. Expect rough edges — the known ones are listed bel
    ```
    ...\steamapps\common\theHunterCotW\
    ```
-3. Run **`theHunterCotW VR Settings.exe`** from that same folder.
+3. Run **`VR Settings	heHunterCotW VR Settings.exe`** — the settings window
+   lives in that subfolder. Make a desktop shortcut to it if you like.
 4. Read the page it opens with, press **Use recommended**, then **Save**, then
    **Launch game**.
 5. Put the headset on before the game finishes loading.
@@ -75,14 +76,25 @@ Everything can be rebound in the panel, and the panel works with a gamepad.
 
 ## Antivirus warnings
 
-**5 of 66 engines** flag the current release; 61 pass it clean. The flags are
-expected for what this is: it loads into the
-game through a proxy DLL and patches engine code in memory to render per eye —
-DLL injection plus code hooking, which is what heuristics look for — and the
-settings window is a bundled Python program, flagged for the same
-guilt-by-association reason. Nothing is code-signed.
+**3 of 66 engines** flag the download; 63 pass it clean. Scanned file by file,
+it is narrower than that:
 
-[VirusTotal scan of the current release](https://www.virustotal.com/gui/file/db43ebf8028b03a9cf741296db93ad20df8ca315876bbb13bc0d3eff96178740/detection) — and the entire source is in this
+| File | Detections |
+|---|---|
+| The settings window, and every file it needs | **0 / 70** |
+| `openxr_loader.dll`, `nvngx_dlss.dll` (NVIDIA-signed) | **0 / 70** |
+| `cotwvr.dll` | 1 / 70 |
+| `XINPUT9_1_0.dll` | 2 / 70 |
+
+The two that are flagged are the two that do the actual work. `XINPUT9_1_0.dll`
+is a small DLL named after a system library that loads another DLL — which is
+how the game loads the mod, and also how a certain kind of malware works.
+`cotwvr.dll` then patches engine code in memory to render one eye at a time.
+Heuristic scanners recognise the *technique*; they are not identifying anything
+in particular, which is why every major engine passes it and only high
+false-positive scanners do not. Nothing is code-signed.
+
+[VirusTotal scan of the current release](https://www.virustotal.com/gui/file/055e61b94789423e51c95a449ad7595b590904f806df7da31b765057d13b00f5) — and the entire source is in this
 repository: read it, or build it yourself with [BUILDING.md](BUILDING.md).
 
 ---
@@ -122,8 +134,8 @@ answer.**
 ## Uninstall
 
 Delete `cotwvr.dll`, `XINPUT9_1_0.dll`, `openxr_loader.dll`, `nvngx_dlss.dll`,
-`cotwvr.ini`, `cotwvr_launcher.cfg` and `theHunterCotW VR Settings.exe`. Nothing
-else is touched.
+`cotwvr.ini`, `cotwvr_launcher.cfg` and the `VR Settings` folder. Nothing else
+is touched.
 
 ---
 

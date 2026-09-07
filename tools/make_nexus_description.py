@@ -25,7 +25,7 @@ VERSION = "1.1.1"
 GAME_BUILD = "9.2 (Peru Hunting Reserve)"
 AUTHOR = "Vaas993"
 
-VIRUSTOTAL = "https://www.virustotal.com/gui/file/db43ebf8028b03a9cf741296db93ad20df8ca315876bbb13bc0d3eff96178740/detection"
+VIRUSTOTAL = "https://www.virustotal.com/gui/file/055e61b94789423e51c95a449ad7595b590904f806df7da31b765057d13b00f5"
 DISCORD = "https://discord.gg/gbC9AkG2Xn"
 PATREON = "https://www.patreon.com/cw/Vaas993"
 PROFILE = "https://www.nexusmods.com/profile/Vaas993/mods"
@@ -88,7 +88,8 @@ further down, and reading them first will save you an evening.
 [*]Unpack the archive.
 [*]Copy [b]every file[/b] into the game folder, beside [b]theHunterCotW_F.exe[/b]
 (usually [i]...\\steamapps\\common\\theHunterCotW\\[/i]).
-[*]Run [b]theHunterCotW VR Settings.exe[/b] from that same folder.
+[*]Run [b]VR Settings\theHunterCotW VR Settings.exe[/b] - the settings window
+lives in that subfolder.
 [*]Read the page it opens with, then press [b]Use recommended[/b], [b]Save[/b],
 and [b]Launch game[/b].
 [*]Have the headset on before the game finishes loading.
@@ -133,7 +134,8 @@ Everything can be rebound in the panel, and the panel works with a gamepad.
 Two windows, and they show the same settings:
 
 [list]
-[*][b]theHunterCotW VR Settings.exe[/b] - the things you set once before playing:
+[*][b]VR Settings\theHunterCotW VR Settings.exe[/b] - the things you set once
+before playing:
 resolution, field of view, anti-aliasing, whether the mod is on at all.
 [*][b]The in-game panel[/b] - everything, while you play, in the headset. Every
 row explains itself in full.
@@ -170,12 +172,19 @@ this build. It identifies the game by fingerprint and refuses to guess.
 [line]
 
 %(h_av)s
-[b]5 of 66 engines[/b] on VirusTotal flag the current release; 61 pass it
-clean. The flags are expected, and here is why, in the open: it loads
-into the game through a proxy DLL and patches engine code in memory to move the
-camera per eye - DLL injection and code hooking, which is exactly what heuristic
-scanners look for. The settings window is a bundled Python program, which gets
-flagged for the same guilt-by-association reason. Nothing is code-signed.
+[b]3 of 66 engines[/b] on VirusTotal flag the download; 63 pass it clean. File
+by file it is narrower still: the settings window and everything it needs scan
+[b]0 of 70[/b], as do the OpenXR loader and NVIDIA's own signed DLSS library.
+The only two flagged are [i]cotwvr.dll[/i] (1 of 70) and [i]XINPUT9_1_0.dll[/i]
+(2 of 70) - the two that do the actual work.
+
+That is not a coincidence, and it is worth saying plainly: XINPUT9_1_0.dll is a
+small DLL named after a system library whose job is to load another DLL, which
+is how the game loads this mod and also how a certain kind of malware works.
+cotwvr.dll then patches the engine's code in memory so it renders one eye at a
+time. Heuristic scanners recognise the TECHNIQUE - they are not identifying
+anything specific, which is why every major engine passes it and only the
+high-false-positive ones do not. Nothing is code-signed.
 
 [list]
 [*][b]VirusTotal scan of this exact release:[/b] [url=%(vt)s]%(vt)s[/url]
