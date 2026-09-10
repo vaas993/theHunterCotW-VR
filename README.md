@@ -2,13 +2,18 @@
 
 Native OpenXR stereo VR mod by **Vaas993**. Explore the game in stereoscopic 3D with head tracking, 6DoF camera movement, and adjustable weapon depth.
 
-## Download version 1.3
+## Download version 1.3.1
 
-[**Download v1.3**](https://github.com/vaas993/theHunterCotW-VR/releases/tag/v1.3) — get `theHunterCotW-VR-v1.3.zip`.
+[**Download v1.3.1**](https://github.com/vaas993/theHunterCotW-VR/releases/tag/v1.3.1) — get `theHunterCotW-VR-v1.3.1.zip`.
 
-Version 1.3 is a regular release. Neural Rendering remains an optional experimental feature with specific runtime/driver requirements.
+Version 1.3.1 is a regular release. Neural Rendering remains an optional experimental feature with runtime compatibility requirements.
 
-## New in 1.3
+## New in 1.3.1
+
+- Removed exact driver/runtime/bridge hash restrictions for Neural Rendering while retaining compatibility and GPU-safety checks.
+- Verified with real-runtime regression tests and confirmed working in-game.
+
+## Features introduced in 1.3
 
 - **Live DLSS source-size changes:** Quality, Balanced, Performance, Ultra Performance, DLAA and Custom. Supported changes no longer require restarting.
 - **Improved native DLAA switching**, including NR with DLAA / Custom 100% on the tested configuration.
@@ -55,7 +60,7 @@ NVIDIA's **`nvngx_dlssnr.dll` is not included**. Acquire it separately from a so
 
 Our companion bridge, `cotwvr-nr/nvngx.dll_dlssnr.dll`, is included. Do not rename an ordinary DLSS DLL or copy a driver-core DLL into the game folder.
 
-This NR integration accepts only the tested runtime, bridge and driver-core SHA-256 fingerprints. **A driver update can make NR decline to start even if it might otherwise be compatible.** See the [release notes](https://github.com/vaas993/theHunterCotW-VR/releases/tag/v1.3) for exact hashes and the tested driver version. Broader compatibility is not yet validated.
+**Version 1.3.1 removes the exact driver, runtime and bridge file-hash whitelist.** A different file fingerprint alone no longer blocks NR. Required API/export checks, private module-path checks, initialization and GPU-safety protections remain. This does not guarantee compatibility with every driver or runtime; the updated build has been tested on the existing setup and confirmed working in-game. See the [release notes](https://github.com/vaas993/theHunterCotW-VR/releases/tag/v1.3.1) for details.
 
 NR is **off by default**. Ordinary DLSS works without the optional NR runtime. When enabling NR, check **NR status**—the switch alone does not prove it is running. Try 100% for full working detail, then 90% or 85% if you need lower GPU cost. Leave GPU timing off except when measuring.
 
@@ -83,11 +88,11 @@ Bindings can be changed in the overlay.
 
 Logs: `%LOCALAPPDATA%/theHunterCotWVR/cotwvr.log`, with the previous run beside it. The launcher includes **Open log folder**.
 
-No new VirusTotal scan is claimed for v1.3. Scan results from older releases do not apply to these files. The mod uses injection/hooking and its binaries are unsigned.
+No new VirusTotal scan is claimed for v1.3.1. Scan results from older releases do not apply to these files. The mod uses injection/hooking and its binaries are unsigned.
 
 ## Source and credits
 
-The v1.3 release includes a separate **Source ZIP** containing the corresponding current mod, bridge and launcher code plus build support. Use that asset for this build: this repository's main source tree and GitHub's automatically generated source archives have not yet been synchronized with the newer experimental candidate. See the source ZIP's `BUILD-THIS-CANDIDATE.txt` for its build entry point and external dependencies.
+The v1.3.1 release includes a separate **Source ZIP** containing the corresponding current mod, bridge and launcher code plus build support. Use that asset for this build: this repository's main source tree and GitHub's automatically generated source archives have not yet been synchronized with the newer experimental candidate. See the source ZIP's `BUILD-THIS-CANDIDATE.txt` for its build entry point and external dependencies.
 
 Built by Vaas993. Mod source is under GPL-3.0; third-party components retain their own licenses. Includes the NVIDIA DLSS SR runtime, the Khronos OpenXR loader, and MinHook. The optional NVIDIA NR runtime is not redistributed in the public package.
 
