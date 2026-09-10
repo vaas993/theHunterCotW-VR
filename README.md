@@ -1,161 +1,98 @@
 # theHunter: Call of the Wild — VR
 
-**Native OpenXR stereo VR for theHunter: Call of the Wild.** The world is drawn
-from the game's own camera, once per eye — real depth, your head turns the view,
-you can lean and step around inside it, and your weapon has depth.
+Native OpenXR stereo VR mod by **Vaas993**. Explore the game in stereoscopic 3D with head tracking, 6DoF camera movement, and adjustable weapon depth.
 
-Not a screen-in-a-void wrapper.
+## Download version 1.3
 
-*a VR mod by Vaas993*
+[**Download v1.3**](https://github.com/vaas993/theHunterCotW-VR/releases/tag/v1.3) — get `theHunterCotW-VR-v1.3.zip`.
 
----
+Version 1.3 is a regular release. Neural Rendering remains an optional experimental feature with specific runtime/driver requirements.
 
-## Download
+## New in 1.3
 
-**[Download the latest release](../../releases/latest)** — one zip, drop it in the
-game folder.
-
----
+- **Live DLSS source-size changes:** Quality, Balanced, Performance, Ultra Performance, DLAA and Custom. Supported changes no longer require restarting.
+- **Improved native DLAA switching**, including NR with DLAA / Custom 100% on the tested configuration.
+- **Optional Neural Rendering (NR)** before DLSS upscaling or native DLAA, tested with full-rate stereo and AER. NR enhances the image and costs GPU time; it is **not frame generation**.
+- **NR working scales:** 50%, 75%, 85%, 90% and 100%. Lower values can reduce cost but soften detail, without changing the headset output size.
+- **Clearer overlay:** grouped settings and a prominent **[ APPLY CHANGES ]** button directly below Quality/Custom. It turns amber when selected values have not been submitted.
+- **Launcher 1.3:** VR & output, Picture & NR, and Setup & notes tabs. Includes NR settings and prevents competing launcher saves while the game runs.
+- Hidden-overlay refresh optimization and a small full-output NR composition optimization. Performance gains depend on your configuration; no universal FPS increase is promised.
 
 ## Requirements
 
-| | |
-|---|---|
-| **Game** | theHunter: Call of the Wild, update **9.2 (Peru Hunting Reserve)**, Steam |
-| **Headset** | Anything with an OpenXR runtime — Meta Quest Link, SteamVR, Virtual Desktop |
-| **DLSS** | Optional. Needs an NVIDIA **RTX** card; there is an alternative for every other card |
-| **Mode** | **Single player only.** Do not use it in multiplayer sessions |
+- theHunter: Call of the Wild, update **9.2 / Peru Hunting Reserve**.
+- An OpenXR runtime such as Meta Quest Link, SteamVR or Virtual Desktop.
+- **Single player only.**
+- NVIDIA RTX hardware for optional DLSS. The mod also provides per-eye smoothing without DLSS.
+- Main test configuration: Quest 3, RTX 5090. Other combinations are not broadly validated.
 
-This is a work in progress. Expect rough edges — the known ones are listed below.
+## Install or upgrade
 
----
+1. Close the game and launcher. Back up existing mod files and `cotwvr.ini`.
+2. Extract the release ZIP beside `theHunterCotW_F.exe`.
+3. The ZIP contains fresh recommended settings. Keep your backed-up INI instead if you want to preserve your current configuration.
+4. Open `VR Settings/theHunterCotW VR Settings.exe`. Launcher saves apply at the next launch.
+5. Start your OpenXR runtime, then launch the game.
+6. Check the game's video settings against the launcher's **Setup & notes** tab. **FXAA + TAA** is required for DLSS and the mod's replacement temporal pass.
 
-## Install
+## Applying changes in game
 
-1. Download the zip and unpack it.
-2. Copy **every file** into the game folder, beside `theHunterCotW_F.exe`:
-   ```
-   ...\steamapps\common\theHunterCotW\
-   ```
-3. Run **`VR Settings	heHunterCotW VR Settings.exe`** — the settings window
-   lives in that subfolder. Make a desktop shortcut to it if you like.
-4. Read the page it opens with, press **Use recommended**, then **Save**, then
-   **Launch game**.
-5. Put the headset on before the game finishes loading.
+In **PICTURE**, choose a DLSS quality mode or Custom source scale. Select **[ APPLY CHANGES ]**, then press **Enter**, **controller A**, or **left/right**.
 
-Nothing in the game is modified. The mod is only the added files, so uninstalling
-is deleting them.
+The amber **CHANGES WAITING** cue means your choices have not been submitted. After Apply, check **Live status** and **Resize status**: submitting a request is not proof that both eyes have activated the requested size.
 
----
+Use that same Apply button after changing **NR working scale**. NR enable and the reconstruction model are separate controls.
 
-## Anti-aliasing — you do not need DLSS
+**Headset/output resolution in VIEW is still fixed at launch and requires restart.** It is not the same as DLSS source scale or NR working scale.
 
-The launcher and the in-game panel both offer three, and the mod sets the game's
-own anti-aliasing to match whichever you pick:
+## Optional Neural Rendering setup
 
-| Choice | Needs | What you get |
-|---|---|---|
-| **NVIDIA DLSS** | RTX card | Best picture, and the only one that can buy frames back by upscaling |
-| **Per-eye smoothing (mod)** | any card | The mod replaces the game's temporal pass with its own, which keeps each eye's history separate — smoothing without the cross-eye ghosting. **Use this if you have no RTX card.** |
-| **Off — the game's own** | — | Nothing from the mod. Sharp, aliased, foliage shimmers |
+NVIDIA's **`nvngx_dlssnr.dll` is not included**. Acquire it separately from a source you are entitled to use, under its provider's terms, and place it here:
 
----
+```text
+<game folder>/cotwvr-nr/nvngx_dlssnr.dll
+```
+
+Our companion bridge, `cotwvr-nr/nvngx.dll_dlssnr.dll`, is included. Do not rename an ordinary DLSS DLL or copy a driver-core DLL into the game folder.
+
+This NR integration accepts only the tested runtime, bridge and driver-core SHA-256 fingerprints. **A driver update can make NR decline to start even if it might otherwise be compatible.** See the [release notes](https://github.com/vaas993/theHunterCotW-VR/releases/tag/v1.3) for exact hashes and the tested driver version. Broader compatibility is not yet validated.
+
+NR is **off by default**. Ordinary DLSS works without the optional NR runtime. When enabling NR, check **NR status**—the switch alone does not prove it is running. Try 100% for full working detail, then 90% or 85% if you need lower GPU cost. Leave GPU timing off except when measuring.
 
 ## Controls
 
-| Key | |
-|---|---|
-| **Insert** (or Ctrl+Alt+O) | open the settings panel in the headset |
-| **Pause** | recentre the view — use it whenever forward stops being forward |
-| **Delete** | show the flat game screen, for menus and the map |
-| **Alt** (held) | free look — the view turns, the weapon stays put |
+| Default control | Action |
+| --- | --- |
+| Insert / Ctrl+Alt+O | Open overlay |
+| Pause | Recenter |
+| Delete | Show flat game screen |
+| Alt, held | Free look |
+| Enter / controller A | Activate the selected Apply button |
+| Left/right | Adjust a setting or activate Apply |
 
-Everything can be rebound in the panel, and the panel works with a gamepad.
+Bindings can be changed in the overlay.
 
----
+## Known limitations and troubleshooting
 
-## Antivirus warnings
+- AER can produce temporal mismatch around moving objects. The separate hitch/frame-pacing investigation remains deferred.
+- Lower NR scales can look softer. An unsafe NR/device fault requires restarting; toggling NR off does not clear it.
+- Earlier DLAA cloud flicker was not reproduced in later testing; a dedicated cloud fix is not claimed.
+- HUD placement controls remain unfinished. 6DoF moves the camera without collision, so you can lean through walls.
+- Scope alignment can shift with head-based free look. View presets were tuned for the tested Quest 3 setup.
+- A black headset image with a normal monitor does **not** by itself diagnose HDR or a driver problem. Include stereo/AER mode, DLSS quality, NR status and recent changes in your report.
 
-**2 of 65 engines** flag the download; 63 pass it clean. Scanned file by file,
-it is narrower than that:
+Logs: `%LOCALAPPDATA%/theHunterCotWVR/cotwvr.log`, with the previous run beside it. The launcher includes **Open log folder**.
 
-| File | Detections |
-|---|---|
-| The settings window, and every file it needs | **0 / 70** |
-| `openxr_loader.dll`, `nvngx_dlss.dll` (NVIDIA-signed) | **0 / 70** |
-| `cotwvr.dll` | 1 / 70 |
-| `XINPUT9_1_0.dll` | 2 / 70 |
+No new VirusTotal scan is claimed for v1.3. Scan results from older releases do not apply to these files. The mod uses injection/hooking and its binaries are unsigned.
 
-Both remaining detections are unnamed generic labels from two of the highest
-false-positive engines in the set. No engine identifies a malware family.
+## Source and credits
 
-The two that are flagged are the two that do the actual work. `XINPUT9_1_0.dll`
-is a small DLL named after a system library that loads another DLL — which is
-how the game loads the mod, and also how a certain kind of malware works.
-`cotwvr.dll` then patches engine code in memory to render one eye at a time.
-Heuristic scanners recognise the *technique*; they are not identifying anything
-in particular, which is why every major engine passes it and only high
-false-positive scanners do not. Nothing is code-signed.
+The v1.3 release includes a separate **Source ZIP** containing the corresponding current mod, bridge and launcher code plus build support. Use that asset for this build: this repository's main source tree and GitHub's automatically generated source archives have not yet been synchronized with the newer experimental candidate. See the source ZIP's `BUILD-THIS-CANDIDATE.txt` for its build entry point and external dependencies.
 
-[VirusTotal scan of the current release](https://www.virustotal.com/gui/file/a890351d521b9bcfddf5ed30cc88f84cfca2e8c52dde064d09eeb753b298453a) — and the entire source is in this
-repository: read it, or build it yourself with [BUILDING.md](BUILDING.md).
+Built by Vaas993. Mod source is under GPL-3.0; third-party components retain their own licenses. Includes the NVIDIA DLSS SR runtime, the Khronos OpenXR loader, and MinHook. The optional NVIDIA NR runtime is not redistributed in the public package.
 
----
-
-## Known issues
-
-- **Objects can shake or shimmer with DLSS on** — worst on close-up geometry and edges. Weapon depth makes it worse - it confuses the picture pass about which camera drew the frame, and the result is seen as the WORLD shaking rather than the weapon. Two things help: DLSS models M and L reduce the shaking noticeably, and turning weapon depth off on the WEAPON tab removes its share of it entirely.
-- **The HUD is drawn flat across the whole view** — rather than at a comfortable distance. The switches that move it are in the in-game panel and currently break more than they fix, which is why they carry a warning.
-- **Leaning does not collide with anything** — 6DoF moves the camera, not the character, so lean far enough and you will lean through a wall. The travel limit in the panel is the guard.
-- **The scope's magnified picture is positioned from your head** — not from the gun - so holding free-look while aimed slides it off the scope.
-- **Sizes and shapes are worked out for a Quest 3** — other headsets run fine but may lose some field or waste pixels. Use the CUSTOM resolution and raise "How much wider" until it fills the view.
-- If theHunter VR starts flickering white or red/purple when DLSS is enabled, try this sequence—it worked for me:
-1. Close the game completely.
-2. Open cotwvr.ini in the game folder and set:dlss_enable = 0
-   taa_replace_pass = 1
-   per_eye_temporal_history = 0
-3. Launch the game and enter actual gameplay. Confirm that the image is stable with DLSS disabled.
-4. Close the game completely again.
-5. Relaunch, enter gameplay, and enable DLSS through the mod’s overlay.
-In my case, DLSS worked normally afterward without replacing any DLLs or changing the NVIDIA driver. Simply starting with DLSS already enabled had not helped previously.
-
----
-
-## If something goes wrong
-
-The mod writes a log to:
-
-```
-%LOCALAPPDATA%\theHunterCotWVR\cotwvr.log
-```
-
-The previous run is kept beside it, and the settings launcher has an **Open log
-folder** button. It records what was detected, which hooks took and every setting
-the mod changed. **Include it in any bug report — it usually contains the
-answer.**
-
-- **Black screen in the headset, game fine on the monitor** — HDR is on. Turn it
-  off in Windows display settings.
-- **The mod starts nothing at all** — the game has probably been updated past
-  this build. The mod identifies the game by fingerprint and refuses to guess.
-- **You want the game back to normal without uninstalling** — set **VR mod** to
-  *off* in the launcher. Every file stays where it is.
-
----
+Unofficial project; not affiliated with NVIDIA, Expansive Worlds or Avalanche Studios.
 
 ## Uninstall
 
-Delete `cotwvr.dll`, `XINPUT9_1_0.dll`, `openxr_loader.dll`, `nvngx_dlss.dll`,
-`cotwvr.ini`, `cotwvr_launcher.cfg` and the `VR Settings` folder. Nothing else
-is touched.
-
----
-
-## Credits
-
-Built by **Vaas993**.
-
-Includes NVIDIA DLSS (`nvngx_dlss.dll`, redistributed under the NVIDIA DLSS SDK
-licence), the Khronos **OpenXR** loader (Apache 2.0) and **MinHook** (BSD
-2-clause). theHunter: Call of the Wild is a trademark of Expansive Worlds /
-Avalanche Studios; this mod is unofficial and not affiliated with them.
+Close the game. Remove the mod's `cotwvr.dll`, `XINPUT9_1_0.dll`, `openxr_loader.dll`, `nvngx_dlss.dll`, `cotwvr.ini`, `cotwvr_launcher.cfg`, `VR Settings` and `cotwvr-nr` folders/files. Keep your backups if needed. Restore desired video settings in the game.
