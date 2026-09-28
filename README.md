@@ -2,16 +2,25 @@
 
 Native OpenXR stereo VR mod by **Vaas993**. Explore the game in stereoscopic 3D with head tracking, 6DoF camera movement, and adjustable weapon depth.
 
-## Download version 1.3.1
+## Download version 1.4.1
 
-[**Download v1.3.1**](https://github.com/vaas993/theHunterCotW-VR/releases/tag/v1.3.1) — get `theHunterCotW-VR-v1.3.1.zip`.
+[**Download v1.4.1**](https://github.com/vaas993/theHunterCotW-VR/releases/tag/v1.4.1) — get `theHunterCotW-VR-v1.4.1.zip`.
 
-Version 1.3.1 is a regular release. Neural Rendering remains an optional experimental feature with runtime compatibility requirements.
+## New in 1.4.1
 
-## New in 1.3.1
+- **The resolution always reaches the game.** The mod watches the game open its own `settings.json` and writes the size and FOV into exactly that file, so it no longer has to guess which account's settings the game uses (this went wrong with more than one copy of the game installed). Switch: `settings_from_game_open`.
 
-- Removed exact driver/runtime/bridge hash restrictions for Neural Rendering while retaining compatibility and GPU-safety checks.
-- Verified with real-runtime regression tests and confirmed working in-game.
+## New in 1.4
+
+- **Works on the September 2026 game update.** All 42 engine addresses are found by signature on that update, on 9.2 (Peru) and on the Epic 9.2 build. Builds the mod has not seen are searched by signature instead of refused.
+- **Full-rate stereo fixed on the September 2026 update:** black headset and reversed depth.
+- **Alternate-eye (AER) fixed on the September 2026 update:** shake and flicker, which got worse with the in-game panel open.
+- **AER: smooth stick turning.** The eye that was not redrawn is turned by the stick turn since it was drawn, the same way the headset already turns it for head turns. No GPU cost. Panel row: *AER: smooth stick turning*.
+- **DLSS in flat play** (no headset, or after Stop VR).
+- **Stereoscopic 3D off:** fixed a black headset with capture upscaling on.
+- **Full view** (experimental, off by default): a picture wide enough to cover the whole headset view.
+
+Every change has its own switch in `cotwvr.ini` that restores the earlier behaviour.
 
 ## Features introduced in 1.3
 
@@ -25,7 +34,7 @@ Version 1.3.1 is a regular release. Neural Rendering remains an optional experim
 
 ## Requirements
 
-- theHunter: Call of the Wild, update **9.2 / Peru Hunting Reserve**.
+- theHunter: Call of the Wild, **September 2026 update** (tested in the headset), or update **9.2 / Peru Hunting Reserve** (Steam or Epic).
 - An OpenXR runtime such as Meta Quest Link, SteamVR or Virtual Desktop.
 - **Single player only.**
 - NVIDIA RTX hardware for optional DLSS. The mod also provides per-eye smoothing without DLSS.
@@ -79,7 +88,7 @@ Bindings can be changed in the overlay.
 
 ## Known limitations and troubleshooting
 
-- AER can produce temporal mismatch around moving objects. The separate hitch/frame-pacing investigation remains deferred.
+- AER can produce temporal mismatch around moving objects (turning is compensated; animals and walking are not).
 - Lower NR scales can look softer. An unsafe NR/device fault requires restarting; toggling NR off does not clear it.
 - Earlier DLAA cloud flicker was not reproduced in later testing; a dedicated cloud fix is not claimed.
 - HUD placement controls remain unfinished. 6DoF moves the camera without collision, so you can lean through walls.
@@ -88,11 +97,11 @@ Bindings can be changed in the overlay.
 
 Logs: `%LOCALAPPDATA%/theHunterCotWVR/cotwvr.log`, with the previous run beside it. The launcher includes **Open log folder**.
 
-No new VirusTotal scan is claimed for v1.3.1. Scan results from older releases do not apply to these files. The mod uses injection/hooking and its binaries are unsigned.
+No new VirusTotal scan is claimed for v1.4.1. Scan results from older releases do not apply to these files. The mod uses injection/hooking and its binaries are unsigned.
 
 ## Source and credits
 
-The v1.3.1 release includes a separate **Source ZIP** containing the corresponding current mod, bridge and launcher code plus build support. Use that asset for this build: this repository's main source tree and GitHub's automatically generated source archives have not yet been synchronized with the newer experimental candidate. See the source ZIP's `BUILD-THIS-CANDIDATE.txt` for its build entry point and external dependencies.
+The v1.4.1 release includes a separate **Source ZIP** containing the corresponding current mod, bridge and launcher code plus build support. Use that asset for this build: this repository's main source tree and GitHub's automatically generated source archives have not yet been synchronized with the newer experimental candidate. See the source ZIP's `BUILD-THIS-CANDIDATE.txt` for its build entry point and external dependencies.
 
 Built by Vaas993. Mod source is under GPL-3.0; third-party components retain their own licenses. Includes the NVIDIA DLSS SR runtime, the Khronos OpenXR loader, and MinHook. The optional NVIDIA NR runtime is not redistributed in the public package.
 
